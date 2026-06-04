@@ -9,3 +9,6 @@ Features:
 - Responsive layout
 
 Built to explore website development and AI-assisted project building.
+
+RESTAURANT MANAGEMENT LINK:
+https://anushka-kh722.github.io/restaurant-management-system/
