@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafe Brew & Bites — OOP Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#fdf8f0;--espresso:#2c1a0e;--latte:#c8956c;--milk:#f5ede0;--foam:#fff9f2;--mocha:#6b3f2a;--mint:#2a6b5a;--gold:#d4a843;--warm-gray:#8a7a6e;--border:rgba(44,26,14,0.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--espresso);overflow-x:hidden}
+nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(253,248,240,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--mocha)}.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:1.5rem;list-style:none}.nav-links a{text-decoration:none;color:var(--warm-gray);font-size:0.88rem;font-weight:500;transition:color 0.2s}.nav-links a:hover{color:var(--mocha)}
+.hero{min-height:100vh;background:linear-gradient(160deg,#2c1a0e 0%,#6b3f2a 55%,#c8956c 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fde9c9;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;padding:6px 18px;border-radius:20px;margin-bottom:1.5rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,5rem);color:#fff;line-height:1.15;margin-bottom:1rem}.hero h1 span{color:var(--gold)}
+.hero p{color:#f0d9be;font-size:1.05rem;max-width:540px;margin:0 auto 2.5rem;line-height:1.7}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--gold);color:var(--espresso);border:none;padding:13px 30px;border-radius:50px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.93rem;cursor:pointer;transition:all 0.2s}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,168,67,0.4)}
+.btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.4);padding:13px 30px;border-radius:50px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:0.93rem;cursor:pointer;transition:all 0.2s}.btn-ghost:hover{background:rgba(255,255,255,0.1)}
+.hero-stats{display:flex;gap:3rem;justify-content:center;margin-top:4rem;flex-wrap:wrap}
+.stat{text-align:center}.stat-num{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);font-weight:700}.stat-label{color:rgba(255,255,255,0.6);font-size:0.75rem;letter-spacing:0.06em;text-transform:uppercase;margin-top:4px}
+section{padding:5rem 2rem}.container{max-width:1100px;margin:0 auto}
+.section-label{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--latte);font-weight:600;margin-bottom:0.75rem}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:var(--espresso);margin-bottom:1rem;line-height:1.2}
+.section-subtitle{color:var(--warm-gray);font-size:0.98rem;max-width:500px;line-height:1.7;margin-bottom:3rem}
+#menu-sec{background:var(--foam)}
+.menu-filter{display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.filter-btn{padding:8px 20px;border-radius:25px;border:1.5px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:500;color:var(--warm-gray);cursor:pointer;transition:all 0.2s}
+.filter-btn.active,.filter-btn:hover{background:var(--mocha);color:#fff;border-color:var(--mocha)}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.2rem}
+.menu-card{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.25rem;transition:all 0.25s;cursor:default;position:relative;overflow:hidden}
+.menu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--latte),var(--gold));transform:scaleX(0);transition:transform 0.25s;transform-origin:left}
+.menu-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(44,26,14,0.1)}.menu-card:hover::before{transform:scaleX(1)}
+.menu-card.in-cart{border-color:var(--mint);background:#f0faf7}
+.card-tag{display:inline-block;font-size:0.68rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:10px;margin-bottom:0.75rem}
+.tag-beverage{background:#fde8d4;color:var(--mocha)}.tag-food{background:#d4f0e8;color:var(--mint)}
+.card-name{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--espresso);margin-bottom:0.3rem}
+.card-sub{font-size:0.78rem;color:var(--warm-gray);margin-bottom:1rem}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-price{font-size:1.08rem;font-weight:600;color:var(--mocha)}.card-price span{font-size:0.73rem;font-weight:400;color:var(--warm-gray)}
+.add-btn{width:34px;height:34px;border-radius:50%;background:var(--mocha);color:#fff;border:none;font-size:1.3rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;line-height:1}.add-btn:hover{background:var(--espresso);transform:scale(1.1)}
+.qty-control{display:flex;align-items:center;gap:8px}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:1rem;color:var(--mocha);font-weight:600;transition:all 0.2s;line-height:1}.qty-btn:hover{background:var(--mocha);color:#fff;border-color:var(--mocha)}
+.qty-num{font-weight:600;font-size:0.92rem;min-width:20px;text-align:center}
+#order-sec{background:var(--cream)}
+.order-layout{display:grid;grid-template-columns:1fr 370px;gap:2rem}
+@media(max-width:820px){.order-layout{grid-template-columns:1fr}}
+.order-form-card{background:#fff;border-radius:20px;border:1px solid var(--border);padding:2rem}
+.form-group{margin-bottom:1.5rem}
+.form-label{font-size:0.84rem;font-weight:600;color:var(--espresso);margin-bottom:0.6rem;display:block}
+.form-options{display:flex;gap:0.6rem;flex-wrap:wrap}
+.opt-btn{padding:9px 16px;border-radius:12px;border:1.5px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;color:var(--warm-gray);cursor:pointer;transition:all 0.2s}
+.opt-btn.sel{background:var(--mocha);color:#fff;border-color:var(--mocha)}
+.bill-card{background:var(--espresso);border-radius:20px;padding:2rem;position:sticky;top:80px;color:#fff}
+.bill-title{font-family:'Playfair Display',serif;font-size:1.35rem;margin-bottom:1.5rem;color:#fde9c9}
+.bill-items{margin-bottom:1.5rem;max-height:260px;overflow-y:auto}
+.bill-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+.bill-item-name{font-size:0.87rem;color:rgba(255,255,255,0.82)}
+.bill-item-price{font-size:0.87rem;font-weight:600;color:var(--gold)}
+.bill-empty{text-align:center;padding:2rem 0;color:rgba(255,255,255,0.3);font-size:0.88rem}
+.bill-divider{border:none;border-top:1px solid rgba(255,255,255,0.15);margin:1rem 0}
+.bill-row{display:flex;justify-content:space-between;padding:4px 0;font-size:0.83rem;color:rgba(255,255,255,0.6)}
+.bill-total{display:flex;justify-content:space-between;padding:12px 0 0;font-size:1.15rem;font-weight:700;color:var(--gold)}
+.pay-btn{width:100%;padding:14px;border-radius:12px;background:var(--gold);color:var(--espresso);border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all 0.2s;margin-top:1.5rem}
+.pay-btn:hover{background:#e8bc52;transform:translateY(-2px)}.pay-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+#concepts-sec{background:var(--espresso)}
+#concepts-sec .section-title{color:#fde9c9}#concepts-sec .section-label{color:var(--latte)}#concepts-sec .section-subtitle{color:rgba(255,255,255,0.5)}
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:1rem}
+.concept-card{background:rgba(255,255,255,0.06);border-radius:16px;border:1px solid rgba(255,255,255,0.1);padding:1.5rem;transition:all 0.25s}
+.concept-card:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
+.c-icon{font-size:1.5rem;margin-bottom:0.7rem}
+.c-name{font-weight:600;font-size:0.92rem;color:var(--gold);margin-bottom:0.45rem}
+.c-desc{font-size:0.8rem;color:rgba(255,255,255,0.52);line-height:1.6}
+.c-code{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#9fd8c8;background:rgba(0,0,0,0.25);padding:4px 8px;border-radius:6px;margin-top:0.5rem;display:inline-block}
+#code-sec{background:#1a1008}
+#code-sec .section-title{color:#fde9c9}#code-sec .section-label{color:var(--latte)}
+.code-window{background:#0d0703;border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden}
+.code-titlebar{background:rgba(255,255,255,0.06);padding:11px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.dot{width:12px;height:12px;border-radius:50%}.dot-r{background:#ff5f56}.dot-y{background:#ffbd2e}.dot-g{background:#27c93f}
+.code-fn{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:rgba(255,255,255,0.35);margin-left:8px}
+.code-body{padding:1.5rem;overflow-x:auto;max-height:560px;overflow-y:auto}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.75;color:#d4c5b0;white-space:pre}
+.kw{color:#c792ea}.cm{color:#546e7a;font-style:italic}.fn{color:#82aaff}.str{color:#c3e88d}.num{color:#f78c6c}.cls{color:#ffcb6b}
+#output-sec{background:#111}
+#output-sec .section-title{color:#fde9c9}#output-sec .section-label{color:var(--latte)}
+.terminal{background:#0d1117;border-radius:16px;border:1px solid rgba(255,255,255,0.1);overflow:hidden}
+.term-bar{background:#161b22;padding:11px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.term-bar span{font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:#8b949e;margin-left:8px}
+.term-body{padding:1.5rem;overflow-x:auto;max-height:500px;overflow-y:auto}
+.term-body pre{font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.72;color:#c9d1d9}
+.tp{color:#3fb950}.ti{color:#79c0ff}.tinfo{color:#e3b341}.tb{color:#6e7681}.tprice{color:#56d364}.ttotal{color:#f78166;font-weight:bold}
+#team-sec{background:var(--foam)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.5rem}
+.team-card{background:#fff;border-radius:20px;border:1px solid var(--border);padding:2rem;text-align:center;transition:all 0.3s}
+.team-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(44,26,14,0.1)}
+.avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin:0 auto 1.25rem;color:#fff}
+.av1{background:linear-gradient(135deg,#c8956c,#6b3f2a)}.av2{background:linear-gradient(135deg,#d4a843,#8a6010)}.av3{background:linear-gradient(135deg,#2a6b5a,#0d3d30)}
+.t-name{font-family:'Playfair Display',serif;font-size:1.12rem;color:var(--espresso);margin-bottom:0.4rem}
+.t-roll{font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--warm-gray);background:var(--milk);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:0.75rem}
+.t-role{font-size:0.83rem;color:var(--latte);font-weight:500}
+footer{background:var(--espresso);color:rgba(255,255,255,0.45);text-align:center;padding:2rem;font-size:0.83rem}
+footer strong{color:var(--gold)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:24px;max-width:460px;width:100%;padding:2.5rem;text-align:center;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-icon{font-size:3rem;margin-bottom:1rem}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--espresso);margin-bottom:0.75rem}
+.modal p{color:var(--warm-gray);line-height:1.7;margin-bottom:1.5rem}
+.modal-close{background:var(--mocha);color:#fff;border:none;padding:12px 32px;border-radius:50px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.93rem}
+.fade-up{opacity:0;transform:translateY(28px);transition:all 0.6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.cart-badge{background:var(--gold);color:var(--espresso);font-size:0.68rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;margin-left:5px}
+.promo-input{flex:1;padding:10px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;background:var(--cream)}
+.promo-input:focus{border-color:var(--latte)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Brew &amp; <span>Bites</span></div>
+  <ul class="nav-links">
+    <li><a href="#menu-sec">Menu</a></li>
+    <li><a href="#order-sec">Order <span id="cartBadge" class="cart-badge" style="display:none">0</span></a></li>
+    <li><a href="#concepts-sec">OOP</a></li>
+    <li><a href="#code-sec">C++ Code</a></li>
+    <li><a href="#output-sec">Output</a></li>
+    <li><a href="#team-sec">Team</a></li>
+  </ul>
+</nav>
+
+<section class="hero" id="home">
+  <div>
+    <div class="hero-badge">C++17 · OOP Project · SRM University</div>
+    <h1>Cafe Brew<br>&amp; <span>Bites</span></h1>
+    <p>A full cafe management system demonstrating 11 Object-Oriented Programming concepts in C++ — beautifully brought to life as an interactive website.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('menu-sec').scrollIntoView({behavior:'smooth'})">Browse Menu &amp; Order</button>
+      <button class="btn-ghost" onclick="document.getElementById('code-sec').scrollIntoView({behavior:'smooth'})">View C++ Source</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">20</div><div class="stat-label">Menu Items</div></div>
+      <div class="stat"><div class="stat-num">11</div><div class="stat-label">OOP Concepts</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Team Members</div></div>
+      <div class="stat"><div class="stat-num">C++17</div><div class="stat-label">Standard</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="menu-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Our Offerings</div>
+      <div class="section-title">Full Menu</div>
+      <div class="section-subtitle">20 handcrafted items — from single-origin espresso to artisan pastas. Add items to build your order.</div>
+    </div>
+    <div class="menu-filter fade-up">
+      <button class="filter-btn active" onclick="filterMenu('all',this)">All Items</button>
+      <button class="filter-btn" onclick="filterMenu('Beverage',this)">Beverages</button>
+      <button class="filter-btn" onclick="filterMenu('Food',this)">Food</button>
+    </div>
+    <div class="menu-grid fade-up" id="menuGrid"></div>
+  </div>
+</section>
+
+<section id="order-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Place Your Order</div>
+      <div class="section-title">Customize &amp; Checkout</div>
+      <div class="section-subtitle">Select your preferences below, then confirm. Discounts and GST are applied automatically — just like in the C++ program.</div>
+    </div>
+    <div class="order-layout fade-up">
+      <div class="order-form-card">
+        <div class="form-group">
+          <label class="form-label">Seating Preference</label>
+          <div class="form-options">
+            <button class="opt-btn sel" onclick="selectOpt(this,'seating','Indoor (AC)')">Indoor (AC)</button>
+            <button class="opt-btn" onclick="selectOpt(this,'seating','Outdoor (Garden)')">Outdoor (Garden)</button>
+            <button class="opt-btn" onclick="selectOpt(this,'seating','Takeaway')">Takeaway</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Mode</label>
+          <div class="form-options">
+            <button class="opt-btn sel" onclick="selectOpt(this,'payment','Cash')">Cash</button>
+            <button class="opt-btn" onclick="selectOpt(this,'payment','UPI / QR Code')">UPI / QR</button>
+            <button class="opt-btn" onclick="selectOpt(this,'payment','Credit/Debit Card')">Card</button>
+            <button class="opt-btn" onclick="selectOpt(this,'payment','Net Banking')">Net Banking</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Promo Code</label>
+          <div style="display:flex;gap:0.75rem">
+            <input type="text" id="promoInput" class="promo-input" placeholder="Try BREW10, CAFE20 or SRM15">
+            <button class="btn-primary" style="border-radius:12px;padding:10px 18px;font-size:0.82rem" onclick="applyPromo()">Apply</button>
+          </div>
+          <div id="promoMsg" style="margin-top:6px;font-size:0.8rem;color:var(--mint)"></div>
+        </div>
+      </div>
+      <div class="bill-card">
+        <div class="bill-title">Your Order</div>
+        <div class="bill-items" id="billItems"><div class="bill-empty">No items yet — browse the menu!</div></div>
+        <hr class="bill-divider">
+        <div class="bill-row"><span>Subtotal</span><span id="bSub">Rs. 0.00</span></div>
+        <div class="bill-row"><span>Auto Discount</span><span id="bDisc" style="color:#56d364">- Rs. 0.00</span></div>
+        <div class="bill-row"><span>Promo</span><span id="bPromo" style="color:#56d364">- Rs. 0.00</span></div>
+        <div class="bill-row"><span>GST (5%)</span><span id="bGst">Rs. 0.00</span></div>
+        <div class="bill-row"><span>Seating</span><span id="bSeat" style="color:rgba(255,255,255,0.82)">Indoor (AC)</span></div>
+        <div class="bill-row"><span>Payment</span><span id="bPay" style="color:rgba(255,255,255,0.82)">Cash</span></div>
+        <hr class="bill-divider">
+        <div class="bill-total"><span>Grand Total</span><span id="bTotal">Rs. 0.00</span></div>
+        <button class="pay-btn" id="payBtn" disabled onclick="placeOrder()">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="concepts-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">C++ Implementation</div>
+      <div class="section-title">OOP Concepts Used</div>
+      <div class="section-subtitle">All 11 required concepts are implemented and annotated with comments in the source code.</div>
+    </div>
+    <div class="concepts-grid fade-up" id="conceptsGrid"></div>
+  </div>
+</section>
+
+<section id="code-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" style="color:var(--latte)">Source Code</div>
+      <div class="section-title" style="color:#fde9c9">C++ Implementation</div>
+      <p style="color:rgba(255,255,255,0.5);margin-bottom:2rem;font-size:0.95rem">Annotated source with all OOP concepts highlighted. Comments mark each concept inline.</p>
+    </div>
+    <div class="code-window fade-up">
+      <div class="code-titlebar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="code-fn">cafe_management.cpp — compiled with g++ -std=c++17</div>
+      </div>
+      <div class="code-body" id="codeBody"></div>
+    </div>
+  </div>
+</section>
+
+<section id="output-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label" style="color:var(--latte)">Program Execution</div>
+      <div class="section-title" style="color:#fde9c9">Compilation &amp; Sample Output</div>
+      <p style="color:rgba(255,255,255,0.5);margin-bottom:2rem;font-size:0.95rem">Actual output from running the compiled C++ program with sample inputs.</p>
+    </div>
+    <div class="terminal fade-up">
+      <div class="term-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span>bash — cafe_management execution</span>
+      </div>
+      <div class="term-body"><pre id="termOutput"></pre></div>
+    </div>
+  </div>
+</section>
+
+<section id="team-sec">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Developers</div>
+      <div class="section-title">Meet the Team</div>
+      <div class="section-subtitle">Developed as part of the Object-Oriented Programming course at SRM Institute of Science and Technology.</div>
+    </div>
+    <div class="team-grid fade-up">
+      <div class="team-card">
+        <div class="avatar av1">SS</div>
+        <div class="t-name">S Samritha</div>
+        <div class="t-roll">RA2511003010821</div>
+        <div class="t-role">Core Architecture &amp; OOP Design</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar av2">AK</div>
+        <div class="t-name">Anushka Khandelwal</div>
+        <div class="t-roll">RA2511003010854</div>
+        <div class="t-role">Menu System &amp; Templates</div>
+      </div>
+      <div class="team-card">
+        <div class="avatar av3">NR</div>
+        <div class="t-name">Neha Rakhesh</div>
+        <div class="t-roll">RA2511003010872</div>
+        <div class="t-role">Billing, STL &amp; Exception Handling</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Cafe Brew &amp; Bites — OOP Project &nbsp;|&nbsp; <strong>SRM Institute of Science and Technology</strong> &nbsp;|&nbsp; C++17</p>
+  <p style="margin-top:0.5rem">S Samritha &nbsp;·&nbsp; Anushka Khandelwal &nbsp;·&nbsp; Neha Rakhesh</p>
+</footer>
+
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <h2>Order Confirmed!</h2>
+    <p id="modalMsg">Your order has been received.</p>
+    <button class="modal-close" onclick="closeModal()">Great, Thanks!</button>
+  </div>
+</div>
+
+<script>
+const menuData=[
+  {id:1,name:"Espresso",price:120,cat:"Beverage",sub:"Strong single-origin shot",tag:"Hot"},
+  {id:2,name:"Cappuccino",price:150,cat:"Beverage",sub:"Espresso, steamed milk, foam",tag:"Hot"},
+  {id:3,name:"Caffe Latte",price:160,cat:"Beverage",sub:"Silky espresso & steamed milk",tag:"Hot"},
+  {id:4,name:"Cold Brew Coffee",price:170,cat:"Beverage",sub:"12-hour cold-steeped brew",tag:"Cold"},
+  {id:5,name:"Iced Caramel Latte",price:180,cat:"Beverage",sub:"Espresso, caramel, milk, ice",tag:"Iced"},
+  {id:6,name:"Mocha",price:165,cat:"Beverage",sub:"Espresso with rich chocolate",tag:"Hot"},
+  {id:7,name:"Flat White",price:145,cat:"Beverage",sub:"Velvety micro-foam coffee",tag:"Hot"},
+  {id:8,name:"Americano",price:130,cat:"Beverage",sub:"Espresso diluted with hot water",tag:"Hot"},
+  {id:9,name:"Frappuccino",price:190,cat:"Beverage",sub:"Blended ice cream coffee",tag:"Iced"},
+  {id:10,name:"Masala Chai",price:80,cat:"Beverage",sub:"Spiced Indian milk tea",tag:"Hot"},
+  {id:11,name:"Penne Arrabbiata",price:260,cat:"Food",sub:"Spicy tomato sauce, Italian",tag:"Italian"},
+  {id:12,name:"Fettuccine Alfredo",price:290,cat:"Food",sub:"Creamy white sauce pasta",tag:"Italian"},
+  {id:13,name:"Spaghetti Aglio e Olio",price:270,cat:"Food",sub:"Garlic, chilli, olive oil",tag:"Italian"},
+  {id:14,name:"Pesto Fusilli",price:280,cat:"Food",sub:"Basil pesto, pine nuts",tag:"Italian"},
+  {id:15,name:"Mac & Cheese",price:220,cat:"Food",sub:"Classic cheesy comfort bowl",tag:"American"},
+  {id:16,name:"Garlic Bread",price:120,cat:"Food",sub:"Toasted with herb butter",tag:"Italian"},
+  {id:17,name:"Croissant Sandwich",price:180,cat:"Food",sub:"Buttery croissant, fresh fillings",tag:"Continental"},
+  {id:18,name:"Avocado Toast",price:200,cat:"Food",sub:"Sourdough, smashed avocado",tag:"Continental"},
+  {id:19,name:"Chocolate Brownie",price:140,cat:"Food",sub:"Warm, fudgy, decadent",tag:"Dessert"},
+  {id:20,name:"Cheesecake Slice",price:160,cat:"Food",sub:"New York style, berry compote",tag:"Dessert"},
+];
+
+const cart={};
+let seating="Indoor (AC)",payment="Cash",promoDiscount=0;
+
+function filterMenu(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMenu(cat);
+}
+
+function renderMenu(cat='all'){
+  const grid=document.getElementById('menuGrid');
+  const items=cat==='all'?menuData:menuData.filter(i=>i.cat===cat);
+  grid.innerHTML=items.map(item=>{
+    const inCart=cart[item.id]>0;
+    return `<div class="menu-card ${inCart?'in-cart':`}`}" id="card-${item.id}">
+      <div class="card-tag tag-${item.cat.toLowerCase()}">${item.cat}</div>
+      <div class="card-name">${item.name}</div>
+      <div class="card-sub">${item.sub} &middot; <em>${item.tag}</em></div>
+      <div class="card-footer">
+        <div class="card-price">Rs. ${item.price} <span>/ item</span></div>
+        ${inCart
+          ?`<div class="qty-control"><button class="qty-btn" onclick="updateCart(${item.id},-1)">&#8722;</button><span class="qty-num">${cart[item.id]}</span><button class="qty-btn" onclick="updateCart(${item.id},1)">+</button></div>`
+          :`<button class="add-btn" onclick="updateCart(${item.id},1)">+</button>`}
+      </div></div>`;
+  }).join('');
+}
+
+function updateCart(id,delta){
+  cart[id]=(cart[id]||0)+delta;
+  if(cart[id]<=0)delete cart[id];
+  const ab=document.querySelector('.filter-btn.active');
+  const cmap={'All Items':'all','Beverages':'Beverage','Food':'Food'};
+  renderMenu(cmap[ab?ab.textContent.trim():'All Items']||'all');
+  updateBill();updateBadge();
+}
+
+function updateBadge(){
+  const n=Object.values(cart).reduce((a,b)=>a+b,0);
+  const b=document.getElementById('cartBadge');
+  if(n>0){b.style.display='inline-flex';b.textContent=n;}else b.style.display='none';
+}
+
+function updateBill(){
+  const keys=Object.keys(cart);
+  const bi=document.getElementById('billItems');
+  if(!keys.length){
+    bi.innerHTML='<div class="bill-empty">No items yet &mdash; browse the menu!</div>';
+    ['bSub','bDisc','bPromo','bGst','bTotal'].forEach(id=>document.getElementById(id).textContent=(id==='bDisc'||id==='bPromo'?'- ':'')+'Rs. 0.00');
+    document.getElementById('payBtn').disabled=true;return;
+  }
+  let sub=0,discTotal=0;
+  let html='';
+  keys.forEach(id=>{
+    const item=menuData.find(m=>m.id==id);
+    const line=item.price*cart[id];sub+=line;
+    const dr=item.cat==='Beverage'?0.05:0.10;
+    discTotal+=item.price*dr*cart[id];
+    html+=`<div class="bill-item"><span class="bill-item-name">${item.name} &times;${cart[id]}</span><span class="bill-item-price">Rs. ${line.toFixed(2)}</span></div>`;
+  });
+  bi.innerHTML=html;
+  const promoAmt=sub*promoDiscount;
+  const gst=(sub-discTotal-promoAmt)*0.05;
+  const grand=sub-discTotal-promoAmt+gst;
+  document.getElementById('bSub').textContent=`Rs. ${sub.toFixed(2)}`;
+  document.getElementById('bDisc').textContent=`- Rs. ${discTotal.toFixed(2)}`;
+  document.getElementById('bPromo').textContent=`- Rs. ${promoAmt.toFixed(2)}`;
+  document.getElementById('bGst').textContent=`Rs. ${gst.toFixed(2)}`;
+  document.getElementById('bTotal').textContent=`Rs. ${grand.toFixed(2)}`;
+  document.getElementById('payBtn').disabled=false;
+}
+
+function selectOpt(btn,type,value){
+  btn.parentElement.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  if(type==='seating'){seating=value;document.getElementById('bSeat').textContent=value;}
+  if(type==='payment'){payment=value;document.getElementById('bPay').textContent=value;}
+}
+
+const promoCodes={'BREW10':0.10,'CAFE20':0.20,'SRM15':0.15};
+function applyPromo(){
+  const code=document.getElementById('promoInput').value.trim().toUpperCase();
+  const msg=document.getElementById('promoMsg');
+  if(promoCodes[code]){promoDiscount=promoCodes[code];msg.textContent=`Promo applied! ${promoDiscount*100}% extra off`;msg.style.color='var(--mint)';}
+  else{promoDiscount=0;msg.textContent='Invalid code. Try BREW10, CAFE20 or SRM15';msg.style.color='#e24b4a';}
+  updateBill();
+}
+
+function placeOrder(){
+  const oid='ORD-'+Math.floor(1000+Math.random()*9000);
+  const total=document.getElementById('bTotal').textContent;
+  document.getElementById('modalMsg').textContent=`Order ${oid} confirmed! ${total} via ${payment}. Seating: ${seating}. Ready in 12–15 minutes.`;
+  document.getElementById('successModal').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('successModal').classList.remove('active');
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  renderMenu('all');updateBill();updateBadge();
+  document.getElementById('promoInput').value='';
+  document.getElementById('promoMsg').textContent='';
+  promoDiscount=0;
+}
+
+const concepts=[
+  {icon:'🏛',name:'Class & Object',desc:'MenuItem, Beverage, Food, Order, Bill, CafeManager are classes. Objects are instantiated throughout main().',code:'class MenuItem { ... }'},
+  {icon:'🧬',name:'Inheritance',desc:'Beverage and Food publicly inherit from abstract class MenuItem, reusing name, price, and category.',code:'class Beverage : public MenuItem'},
+  {icon:'🎭',name:'Polymorphism',desc:'display() and getDiscountedPrice() are called through MenuItem* pointers with runtime dispatch via vtable.',code:'item->display(); // virtual dispatch'},
+  {icon:'🔧',name:'Operator Overloading',desc:'The + operator is overloaded in Bill to combine two separate bills into one consolidated bill.',code:'Bill operator+(const Bill& o)'},
+  {icon:'🚫',name:'Abstract Class',desc:'MenuItem is abstract — it declares display() as a pure virtual function and cannot be instantiated.',code:'virtual void display() = 0;'},
+  {icon:'⚡',name:'Virtual Function',desc:'display() and getDiscountedPrice() are virtual in MenuItem and overridden differently in Beverage and Food.',code:'virtual double getDiscountedPrice()'},
+  {icon:'🛡',name:'Exception Handling',desc:'CafeException (custom) is thrown for invalid item numbers or zero quantity, caught in takeOrder() with try/catch.',code:'throw CafeException("Invalid...");'},
+  {icon:'👥',name:'Friend Function',desc:'printOrderSummary() is a friend of Order, giving it direct access to private items, seating, and payment data.',code:'friend void printOrderSummary(...)'},
+  {icon:'📐',name:'Function Template',desc:'displayInfo<T>() is a function template printing any label-value pair regardless of the value type.',code:'template<typename T> void displayInfo'},
+  {icon:'📦',name:'Class Template',desc:'Pair<K,V> is a generic class template holding two values of any types, used for cafe metadata.',code:'template<K,V> class Pair'},
+  {icon:'🗂',name:'STL',desc:'std::vector<MenuItem*> stores all items. std::map<string,vector<MenuItem*>> organizes them by category.',code:'map<string, vector<MenuItem*>> menu'},
+];
+
+document.getElementById('conceptsGrid').innerHTML=concepts.map(c=>
+  `<div class="concept-card"><div class="c-icon">${c.icon}</div><div class="c-name">${c.name}</div><div class="c-desc">${c.desc}</div><div class="c-code">${c.code}</div></div>`
+).join('');
+
+document.getElementById('codeBody').innerHTML=`<pre><span class="cm">// ============================================================
+// CAFE MANAGEMENT SYSTEM - C++ OOP Demonstration
+// S Samritha | Anushka Khandelwal | Neha Rakhesh
+// ============================================================</span>
+
+<span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;vector&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;map&gt;</span>         <span class="cm">// STL</span>
+<span class="kw">#include</span> <span class="str">&lt;stdexcept&gt;</span>  <span class="cm">// Exception Handling</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// ── FUNCTION TEMPLATE ──────────────────────────────────────</span>
+<span class="kw">template</span> &lt;<span class="kw">typename</span> T&gt;
+<span class="kw">void</span> <span class="fn">displayInfo</span>(<span class="kw">const</span> string&amp; label, T value) {
+    cout &lt;&lt; label &lt;&lt; <span class="str">": "</span> &lt;&lt; value &lt;&lt; endl;
+}
+
+<span class="cm">// ── CLASS TEMPLATE ──────────────────────────────────────────</span>
+<span class="kw">template</span> &lt;<span class="kw">typename</span> K, <span class="kw">typename</span> V&gt;
+<span class="kw">class</span> <span class="cls">Pair</span> {
+<span class="kw">public</span>:
+    K key; V value;
+    <span class="fn">Pair</span>(K k, V v) : key(k), value(v) {}
+    <span class="kw">void</span> <span class="fn">display</span>() <span class="kw">const</span> { cout &lt;&lt; key &lt;&lt; <span class="str">" -&gt; "</span> &lt;&lt; value &lt;&lt; endl; }
+};
+
+<span class="cm">// ── ABSTRACT CLASS + VIRTUAL FUNCTION ──────────────────────</span>
+<span class="kw">class</span> <span class="cls">MenuItem</span> {
+<span class="kw">protected</span>:
+    string name, category;
+    <span class="kw">double</span> price;
+<span class="kw">public</span>:
+    <span class="fn">MenuItem</span>(string n, <span class="kw">double</span> p, string c) : name(n), price(p), category(c) {}
+
+    <span class="kw">virtual void</span> <span class="fn">display</span>() <span class="kw">const</span> = <span class="num">0</span>;  <span class="cm">// Pure virtual → Abstract class</span>
+
+    <span class="kw">virtual double</span> <span class="fn">getDiscountedPrice</span>() <span class="kw">const</span> {  <span class="cm">// Virtual function</span>
+        <span class="kw">return</span> price;
+    }
+    string <span class="fn">getName</span>() <span class="kw">const</span> { <span class="kw">return</span> name; }
+    <span class="kw">double</span> <span class="fn">getPrice</span>() <span class="kw">const</span> { <span class="kw">return</span> price; }
+    <span class="kw">virtual</span> ~<span class="fn">MenuItem</span>() {}
+};
+
+<span class="cm">// ── INHERITANCE: Beverage inherits MenuItem ─────────────────</span>
+<span class="kw">class</span> <span class="cls">Beverage</span> : <span class="kw">public</span> <span class="cls">MenuItem</span> {
+    string temperature;
+<span class="kw">public</span>:
+    <span class="fn">Beverage</span>(string n, <span class="kw">double</span> p, string temp)
+        : <span class="fn">MenuItem</span>(n, p, <span class="str">"Beverage"</span>), temperature(temp) {}
+
+    <span class="kw">void</span> <span class="fn">display</span>() <span class="kw">const override</span> {  <span class="cm">// Polymorphism</span>
+        cout &lt;&lt; name &lt;&lt; <span class="str">" Rs."</span> &lt;&lt; price &lt;&lt; <span class="str">" ["</span> &lt;&lt; temperature &lt;&lt; <span class="str">"]"</span> &lt;&lt; endl;
+    }
+    <span class="kw">double</span> <span class="fn">getDiscountedPrice</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> price * <span class="num">0.95</span>;  <span class="cm">// 5% beverage discount</span>
+    }
+};
+
+<span class="cm">// ── INHERITANCE: Food inherits MenuItem ─────────────────────</span>
+<span class="kw">class</span> <span class="cls">Food</span> : <span class="kw">public</span> <span class="cls">MenuItem</span> {
+    string cuisine;
+<span class="kw">public</span>:
+    <span class="fn">Food</span>(string n, <span class="kw">double</span> p, string c)
+        : <span class="fn">MenuItem</span>(n, p, <span class="str">"Food"</span>), cuisine(c) {}
+
+    <span class="kw">void</span> <span class="fn">display</span>() <span class="kw">const override</span> {  <span class="cm">// Polymorphism</span>
+        cout &lt;&lt; name &lt;&lt; <span class="str">" Rs."</span> &lt;&lt; price &lt;&lt; <span class="str">" ["</span> &lt;&lt; cuisine &lt;&lt; <span class="str">"]"</span> &lt;&lt; endl;
+    }
+    <span class="kw">double</span> <span class="fn">getDiscountedPrice</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> price * <span class="num">0.90</span>;  <span class="cm">// 10% food discount</span>
+    }
+};
+
+<span class="cm">// ── CLASS: Order — FRIEND FUNCTION declared here ────────────</span>
+<span class="kw">class</span> <span class="cls">Order</span> {
+    vector&lt;pair&lt;MenuItem*, <span class="kw">int</span>&gt;&gt; items;  <span class="cm">// STL vector</span>
+    string seatingPreference, paymentMode;
+<span class="kw">public</span>:
+    <span class="kw">friend void</span> <span class="fn">printOrderSummary</span>(<span class="kw">const</span> Order&amp; o);  <span class="cm">// Friend function</span>
+    <span class="kw">void</span> <span class="fn">addItem</span>(MenuItem* item, <span class="kw">int</span> qty) { items.push_back({item, qty}); }
+    <span class="kw">void</span> <span class="fn">setSeating</span>(string s) { seatingPreference = s; }
+    <span class="kw">void</span> <span class="fn">setPayment</span>(string p) { paymentMode = p; }
+    <span class="kw">double</span> <span class="fn">calculateTotal</span>() <span class="kw">const</span> {
+        <span class="kw">double</span> t = <span class="num">0</span>;
+        <span class="kw">for</span> (<span class="kw">auto</span>&amp; e : items) t += e.first-&gt;<span class="fn">getPrice</span>() * e.second;
+        <span class="kw">return</span> t;
+    }
+};
+
+<span class="cm">// ── FRIEND FUNCTION: Accesses Order's private data ──────────</span>
+<span class="kw">void</span> <span class="fn">printOrderSummary</span>(<span class="kw">const</span> Order&amp; o) {
+    <span class="kw">for</span> (<span class="kw">auto</span>&amp; e : o.items)  <span class="cm">// Direct access to private member!</span>
+        cout &lt;&lt; e.first-&gt;<span class="fn">getName</span>() &lt;&lt; <span class="str">" x"</span> &lt;&lt; e.second &lt;&lt; endl;
+    cout &lt;&lt; o.seatingPreference &lt;&lt; endl;
+}
+
+<span class="cm">// ── OPERATOR OVERLOADING: Combine two Bills ─────────────────</span>
+<span class="kw">class</span> <span class="cls">Bill</span> {
+<span class="kw">public</span>:
+    <span class="kw">double</span> subtotal, tax, discount, grandTotal;
+    string orderId;
+    <span class="fn">Bill</span>(string id, <span class="kw">double</span> sub, <span class="kw">double</span> disc) {
+        orderId = id; subtotal = sub; discount = disc;
+        tax = (sub - disc) * <span class="num">0.05</span>;
+        grandTotal = sub - disc + tax;
+    }
+    Bill <span class="kw">operator</span>+(<span class="kw">const</span> Bill&amp; other) <span class="kw">const</span> {  <span class="cm">// Operator overloading</span>
+        <span class="kw">return</span> <span class="fn">Bill</span>(<span class="str">"COMBINED"</span>, subtotal + other.subtotal, discount + other.discount);
+    }
+    <span class="kw">void</span> <span class="fn">print</span>() <span class="kw">const</span> { <span class="cm">/* formatted bill output */</span> }
+};
+
+<span class="cm">// ── EXCEPTION HANDLING: Custom exception class ──────────────</span>
+<span class="kw">class</span> <span class="cls">CafeException</span> : <span class="kw">public</span> exception {
+    string message;
+<span class="kw">public</span>:
+    <span class="fn">CafeException</span>(string msg) : message(msg) {}
+    <span class="kw">const char</span>* <span class="fn">what</span>() <span class="kw">const noexcept override</span> { <span class="kw">return</span> message.<span class="fn">c_str</span>(); }
+};
+
+<span class="cm">// ── CLASS: CafeManager — STL map + vector ───────────────────</span>
+<span class="kw">class</span> <span class="cls">CafeManager</span> {
+    map&lt;string, vector&lt;MenuItem*&gt;&gt; menuByCategory;  <span class="cm">// STL map</span>
+    vector&lt;MenuItem*&gt; allItems;                       <span class="cm">// STL vector</span>
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">loadMenu</span>() {
+        allItems.push_back(<span class="kw">new</span> <span class="fn">Beverage</span>(<span class="str">"Espresso"</span>, <span class="num">120.00</span>, <span class="str">"Hot"</span>));
+        allItems.push_back(<span class="kw">new</span> <span class="fn">Food</span>(<span class="str">"Penne Arrabbiata"</span>, <span class="num">260.00</span>, <span class="str">"Italian"</span>));
+        <span class="cm">// ... 18 more items ...</span>
+        <span class="kw">for</span> (<span class="kw">auto</span> item : allItems)
+            menuByCategory[item-&gt;<span class="fn">getCategory</span>()].push_back(item);
+    }
+    <span class="kw">void</span> <span class="fn">displayMenu</span>() <span class="kw">const</span> {
+        <span class="kw">for</span> (<span class="kw">auto</span>&amp; cat : menuByCategory)  <span class="cm">// STL map iteration</span>
+            <span class="kw">for</span> (<span class="kw">auto</span> item : cat.second)
+                item-&gt;<span class="fn">display</span>();  <span class="cm">// POLYMORPHISM: virtual dispatch</span>
+    }
+    Order <span class="fn">takeOrder</span>() {
+        <span class="kw">try</span> {
+            <span class="kw">if</span> (choice &lt; <span class="num">1</span> || choice &gt; allItems.size())
+                <span class="kw">throw</span> <span class="fn">CafeException</span>(<span class="str">"Invalid item: "</span> + to_string(choice));
+        } <span class="kw">catch</span> (CafeException&amp; e) {
+            cout &lt;&lt; <span class="str">"[ERROR] "</span> &lt;&lt; e.<span class="fn">what</span>() &lt;&lt; endl;
+        }
+    }
+};
+
+<span class="cm">// ── MAIN ─────────────────────────────────────────────────────</span>
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cm">// CLASS TEMPLATE usage</span>
+    Pair&lt;string, string&gt; cafeInfo(<span class="str">"Location"</span>, <span class="str">"MG Road, Chennai"</span>);
+    cafeInfo.<span class="fn">display</span>();
+
+    <span class="cm">// FUNCTION TEMPLATE usage</span>
+    <span class="fn">displayInfo</span>(<span class="str">"Opening Hours"</span>, <span class="str">"8:00 AM - 10:00 PM"</span>);
+
+    CafeManager manager;
+    manager.<span class="fn">loadMenu</span>();
+    manager.<span class="fn">displayMenu</span>();  <span class="cm">// calls virtual display() on each item</span>
+
+    Order myOrder = manager.<span class="fn">takeOrder</span>();
+    <span class="fn">printOrderSummary</span>(myOrder);  <span class="cm">// FRIEND FUNCTION</span>
+
+    Bill bill = manager.<span class="fn">generateBill</span>(myOrder);
+    bill.<span class="fn">print</span>();
+
+    Bill extra(<span class="str">"EXTRA"</span>, <span class="num">250.00</span>, <span class="num">25.00</span>);
+    Bill combined = bill + extra;  <span class="cm">// OPERATOR OVERLOADING</span>
+    combined.<span class="fn">print</span>();
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>`;
+
+document.getElementById('termOutput').innerHTML=`<span class="tp">$ </span><span class="ti">g++ -o cafe_management cafe_management.cpp -std=c++17</span>
+<span class="tp">$ </span><span class="ti">echo "Compiled successfully"</span>
+Compiled successfully
+
+<span class="tp">$ </span><span class="ti">./cafe_management</span>
+
+<span class="tb">============================================</span>
+   CAFE BREW &amp; BITES - Management System
+<span class="tb">============================================</span>
+<span class="tinfo">Location -&gt; No. 12, MG Road, Chennai</span>
+<span class="tinfo">Total Tables -&gt; 30</span>
+Opening Hours                 : 8:00 AM - 10:00 PM
+WiFi Password                 : brewandbites2024
+
+<span class="tb">╔══════════════════════════════════════════╗</span>
+<span class="tb">║        CAFE BREW &amp; BITES — MENU          ║</span>
+<span class="tb">╚══════════════════════════════════════════╝</span>
+
+  ── Beverage ──
+  [ 1]   Espresso                  Rs.120.00   [Hot]
+  [ 2]   Cappuccino                Rs.150.00   [Hot]
+  [ 3]   Caffe Latte               Rs.160.00   [Hot]
+  [ 4]   Cold Brew Coffee          Rs.170.00   [Cold]
+  [ 5]   Iced Caramel Latte        Rs.180.00   [Iced]
+  [ 6]   Mocha                     Rs.165.00   [Hot]
+  [ 7]   Flat White                Rs.145.00   [Hot]
+  [ 8]   Americano                 Rs.130.00   [Hot]
+  [ 9]   Frappuccino               Rs.190.00   [Iced]
+  [10]   Masala Chai               Rs.80.00    [Hot]
+
+  ── Food ──
+  [11]   Penne Arrabbiata          Rs.260.00   [Italian]
+  [12]   Fettuccine Alfredo        Rs.290.00   [Italian]
+  [13]   Spaghetti Aglio e Olio    Rs.270.00   [Italian]
+  [14]   Pesto Fusilli             Rs.280.00   [Italian]
+  [15]   Mac &amp; Cheese              Rs.220.00   [American]
+  [16]   Garlic Bread              Rs.120.00   [Italian]
+  [17]   Croissant Sandwich        Rs.180.00   [Continental]
+  [18]   Avocado Toast             Rs.200.00   [Continental]
+  [19]   Chocolate Brownie         Rs.140.00   [Dessert]
+  [20]   Cheesecake Slice          Rs.160.00   [Dessert]
+
+<span class="ti">Enter item number (1-20): 3</span>
+<span class="ti">Enter quantity: 2</span>
+Added: Caffe Latte x2
+<span class="ti">Add more items? (y/n): y</span>
+<span class="ti">Enter item number (1-20): 5</span>
+<span class="ti">Enter quantity: 1</span>
+Added: Iced Caramel Latte x1
+<span class="ti">Add more items? (y/n): n</span>
+
+<span class="ti">Enter item number (1-20): 99</span>
+<span class="tinfo">[ERROR] Invalid menu item number: 99. Please try again.</span>
+
+Seating: [1] Indoor (AC)  [2] Outdoor  [3] Takeaway
+<span class="ti">Your choice: 1</span>
+Payment: [1] Cash  [2] UPI  [3] Card  [4] Net Banking
+<span class="ti">Your choice: 2</span>
+
+<span class="tb">========================================</span>
+          ORDER SUMMARY (Friend Fn)
+<span class="tb">========================================</span>
+Caffe Latte             x2  = <span class="tprice">Rs.320.00</span>
+Iced Caramel Latte      x1  = <span class="tprice">Rs.180.00</span>
+<span class="tb">----------------------------------------</span>
+Seating:                    <span class="tinfo">Indoor (AC)</span>
+Payment:                    <span class="tinfo">UPI / QR Code</span>
+<span class="tb">========================================</span>
+
+<span class="tb">╔══════════════════════════════════════╗</span>
+<span class="tb">║          CAFE BREW &amp; BITES           ║</span>
+<span class="tb">║         FINAL BILL - ORD-1001        ║</span>
+<span class="tb">╠══════════════════════════════════════╣</span>
+<span class="tb">║</span> Subtotal:   Rs.                <span class="tprice">500.00</span> <span class="tb">║</span>
+<span class="tb">║</span> Discount:  -Rs.                 <span class="tinfo">25.00</span> <span class="tb">║</span>
+<span class="tb">║</span> GST (5%):   Rs.                 <span class="tinfo">23.75</span> <span class="tb">║</span>
+<span class="tb">║                                      ║</span>
+<span class="tb">║</span> GRAND TOTAL: Rs.               <span class="ttotal">498.75</span> <span class="tb">║</span>
+<span class="tb">╚══════════════════════════════════════╝</span>
+
+[Operator Overloading demo: bill + extraOrder]
+<span class="tb">╔══════════════════════════════════════╗</span>
+<span class="tb">║         FINAL BILL - COMBINED        ║</span>
+<span class="tb">╠══════════════════════════════════════╣</span>
+<span class="tb">║</span> Subtotal:   Rs.                <span class="tprice">750.00</span> <span class="tb">║</span>
+<span class="tb">║</span> GRAND TOTAL: Rs.               <span class="ttotal">735.00</span> <span class="tb">║</span>
+<span class="tb">╚══════════════════════════════════════╝</span>
+
+<span class="tinfo">Thank you for visiting Cafe Brew &amp; Bites! Please visit again!</span>`;
+
+renderMenu();
+
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.08});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
